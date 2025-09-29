@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+    <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+  </marker>
+  <style>
+    .t{font:700 22px sans-serif;fill:#111}
+    .l{font:600 16px sans-serif;fill:#111}
+    .n{font:12px sans-serif;fill:#333}
+    .box{fill:#f9fbff;stroke:#3558e5;stroke-width:2;rx:10}
+    .fw{fill:#fff7f7;stroke:#e55;stroke-width:2;rx:8}
+    .ssl{fill:#eef9f0;stroke:#2e7d32;rx:8}
+    .grp{fill:#fff;stroke:#aaa;stroke-dasharray:6 4;rx:12}
+    .a{stroke:#333;stroke-width:2;marker-end:url(#arrow)}
+  </style>
+</defs>
+<text x="700" y="40" class="t" text-anchor="middle">What happens when you type https://www.google.com and press Enter</text>
+
+<!-- Client + DNS -->
+<rect x="40" y="120" width="200" height="100" class="box"/><text x="140" y="160" class="l" text-anchor="middle">Browser</text><text x="140" y="185" class="n" text-anchor="middle">User device</text>
+<rect x="300" y="120" width="240" height="100" class="box"/><text x="420" y="160" class="l" text-anchor="middle">DNS Resolver</text><text x="420" y="185" class="n" text-anchor="middle">A/AAAA for www.google.com</text>
+
+<!-- Firewalls + LB -->
+<rect x="580" y="110" width="40" height="120" class="fw"/><text x="600" y="155" class="n" text-anchor="middle">FW</text>
+<rect x="650" y="120" width="300" height="100" class="ssl"/><text x="800" y="160" class="l" text-anchor="middle">Edge / Load Balancer</text><text x="800" y="185" class="n" text-anchor="middle">TLS (HTTPS) • L7 routing</text>
+<rect x="980" y="110" width="40" height="120" class="fw"/><text x="1000" y="155" class="n" text-anchor="middle">FW</text>
+
+<!-- Web/App -->
+<rect x="1040" y="80" width="320" height="160" class="box"/><text x="1200" y="130" class="l" text-anchor="middle">Web Server</text><text x="1200" y="155" class="n" text-anchor="middle">Nginx/Apache</text>
+<rect x="1040" y="270" width="320" height="160" class="box"/><text x="1200" y="320" class="l" text-anchor="middle">Application Server</text><text x="1200" y="345" class="n" text-anchor="middle">Business logic</text>
+
+<!-- DB -->
+<rect x="1040" y="460" width="320" height="140" class="box"/><text x="1200" y="505" class="l" text-anchor="middle">Database</text><text x="1200" y="530" class="n" text-anchor="middle">Queries / transactions</text>
+
+<!-- Arrows -->
+<line x1="240" y1="170" x2="300" y2="170" class="a"/><text x="270" y="160" class="n" text-anchor="middle">DNS</text>
+<line x1="540" y1="170" x2="580" y2="170" class="a"/><text x="560" y="160" class="n" text-anchor="middle">TCP/UDP 443</text>
+<line x1="620" y1="170" x2="650" y2="170" class="a"/>
+<line x1="950" y1="170" x2="980" y2="170" class="a"/>
+<line x1="950" y1="170" x2="1040" y2="160" class="a"/><text x="995" y="150" class="n" text-anchor="middle">HTTPS</text>
+<line x1="1200" y1="240" x2="1200" y2="270" class="a"/><text x="1215" y="255" class="n">internal</text>
+<line x1="1200" y1="430" x2="1200" y2="460" class="a"/><text x="1215" y="445" class="n">SQL</text>
+
+<!-- Notes -->
+<text x="800" y="260" class="n" text-anchor="middle">LB may terminate TLS then re-encrypt to backends (mTLS)</text>
+<text x="1200" y="620" class="n" text-anchor="middle">Replicas/caches often sit here too</text>
+</svg>
