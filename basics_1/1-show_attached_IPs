@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Display all active IPv4 addresses (one per line), including localhost
+
+set -euo pipefail
+
+# Use `ip` (present on Ubuntu 22.04). -o for one-line, -4 for IPv4.
+# Extract the address field, strip CIDR, print unique lines.
+if ! command -v ip >/dev/null 2>&1; then
+  echo "ip command not found" >&2
+  exit 1
+fi
+
+ip -4 -o addr show | awk '{print $4}' | cut -d/ -f1 | sort -u

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Listen on TCP port 98 on 127.0.0.1 and print received data
+
+set -euo pipefail
+
+# Re-exec with sudo if not root (binding <1024 usually requires root)
+if [ "${EUID:-$(id -u)}" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+  exec sudo bash "$0" "$@"
+fi
+
+if ! command -v nc >/dev/null 2>&1; then
+  echo "nc (netcat) not found. Install with: sudo apt-get update && sudo apt-get install -y netcat-openbsd" >&2
+  exit 1
+fi
+
+# netcat-openbsd syntax on Ubuntu 22.04:
+# -l : listen, -p : port, -s : source address, -k : keep open for multiple connections (optional)
+# For the exercise, single connection is fine; remove -k to exit after client disconnects.
+nc -l -s 127.0.0.1 -p 98
