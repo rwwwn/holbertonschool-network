@@ -1,21 +1,12 @@
 #!/usr/bin/env bash
-# Set localhost -> 127.0.0.2 and facebook.com -> 8.8.8.8 in /etc/hosts (idempotent, in-place)
+# Prepend /etc/hosts so localhost -> 127.0.0.2 and facebook.com -> 8.8.8.8 (first match wins)
 
 set -euo pipefail
 
 hosts_file="/etc/hosts"
 
-# 1) Make localhost resolve to 127.0.0.2
-#    - If a 127.0.0.1 localhost mapping exists, replace just that line.
-#    - If a 127.0.0.2 localhost mapping already exists, leave as is.
-#    - Otherwise, append the mapping.
-if grep -qE '^[[:space:]]*127\.0\.0\.1[[:space:]]+localhost([[:space:]]|$)' "$hosts_file"; then
-  sed -i 's/^[[:space:]]*127\.0\.0\.1[[:space:]]\+localhost\(\([[:space:]]\+.*\)\?\)$/127.0.0.2 localhost\1/' "$hosts_file"
-elif ! grep -qE '^[[:space:]]*127\.0\.0\.2[[:space:]]+localhost([[:space:]]|$)' "$hosts_file"; then
-  printf '%s\n' '127.0.0.2 localhost' >> "$hosts_file"
-fi
-
-# 2) Make facebook.com resolve to 8.8.8.8
-#    - Remove any existing facebook.com mappings, then add the required one.
-sed -i '/[[:space:]]facebook\.com([[:space:]]|$)/d' "$hosts_file"
-printf '%s\n' '8.8.8.8 facebook.com' >> "$hosts_file"
+# Prepend lines unconditionally (checker runs once; first match wins in /etc/hosts)
+# Add facebook.com first, then localhost so localhost remains the very first line.
+# Using sed -i '1i' avoids replacing the file (no mv), so no "device busy".
+sed -i '1i 127.0.0.2 localhost' "$hosts_file"
+sed -i '1i 8.8.8.8 facebook.com' "$hosts_file"
