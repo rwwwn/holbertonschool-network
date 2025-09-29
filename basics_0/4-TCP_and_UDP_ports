@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Display listening TCP/UDP and UNIX domain sockets with PID/Program
+
+set -euo pipefail
+
+# Re-exec with sudo when available to include PID/Program for all sockets
+if [ "${EUID:-$(id -u)}" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+  exec sudo bash "$0" "$@"
+fi
+
+if command -v ss >/dev/null 2>&1; then
+  echo "Active Internet connections (only servers)"
+  # TCP listening with program names
+  ss -lntp
+  # UDP listening with program names
+  ss -lnup
+  echo "Active UNIX domain sockets (only servers)"
+  ss -lxp
+elif command -v netstat >/dev/null 2>&1; then
+  # Fallback if ss isn't available
+  netstat -lntup
+  netstat -lxp
+else
+  echo "Neither 'ss' nor 'netstat' is available on this system." >&2
+  exit 1
+fi

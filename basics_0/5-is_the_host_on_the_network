@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Ping an IP passed as argument 5 times; show usage if no argument
+
+set -euo pipefail
+
+if [ "$#" -ne 1 ] || [ -z "$1" ]; then
+  echo "Usage: 5-is_the_host_on_the_network {IP_ADDRESS}"
+  exit 1
+fi
+
+ip="$1"
+# -c 5: count 5 pings; -n: numeric output (no DNS); works on Ubuntu 22.04
+ping -n -c 5 "$ip"
