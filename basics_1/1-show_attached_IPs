@@ -1,24 +1,16 @@
 #!/usr/bin/env bash
-# Print active IPv4 addresses (one per line) using ifconfig only
+# Display active IPv4s using ifconfig + grep -oP, preserving order (no sort)
 
 set -euo pipefail
 
-# Find ifconfig in common locations (jail PATHs often miss /sbin)
-IFCONFIG_BIN=""
-cand="$(command -v ifconfig 2>/dev/null || true)"
-for p in "$cand" /sbin/ifconfig /usr/sbin/ifconfig /bin/ifconfig; do
-  if [ -n "${p:-}" ] && [ -x "$p" ]; then
-    IFCONFIG_BIN="$p"
-    break
-  fi
-done
+# Find ifconfig (jails often miss /sbin in PATH)
+IFCONFIG_BIN="$(command -v ifconfig 2>/dev/null || true)"
+[ -z "$IFCONFIG_BIN" ] && [ -x /sbin/ifconfig ] && IFCONFIG_BIN="/sbin/ifconfig"
+[ -z "$IFCONFIG_BIN" ] && [ -x /usr/sbin/ifconfig ] && IFCONFIG_BIN="/usr/sbin/ifconfig"
 [ -n "$IFCONFIG_BIN" ] || { echo "ifconfig command not found" >&2; exit 1; }
 
-# Support both net-tools formats:
-#   "inet 10.0.2.15"  -> awk prints $2
-#   "inet addr:10.0.2.15" -> awk prints $2 then sed strips 'addr:'
-"$IFCONFIG_BIN" -a 2>/dev/null \
-  | grep -oE 'inet( addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' \
-  | awk '{print $2}' \
-  | sed 's/^addr://; s/^ *//' \
-  | sort -u
+# Use the same PCRE the checker uses to extract IPv4 after "inet "
+# Then dedupe while keeping the original order
+"$IFCONFIG_BIN" \
+  | grep -oP '(?<=inet\s)\d+(\.\d+){3}' \
+  | awk '!seen[$0]++'
